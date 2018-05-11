@@ -81,7 +81,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-[fnames pathname] = uigetfile({'*.mat';'*.smr'},'Choose file(s) to analyze:','multiselect','on');
+[fnames pathname] = uigetfile({'*.mat';'*.smr';'*.smrx'},'Choose file(s) to analyze:','multiselect','on');
 handles.FNAMES=fnames;
 handles.PATHNAME=pathname;
 
