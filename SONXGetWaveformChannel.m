@@ -11,8 +11,8 @@ chandiv = chinfoStruct.ChanDiv;
 scale = chinfoStruct.scale;
 offset = chinfoStruct.offset;
 
-N = (stopPt - startPt)/chandiv;
+N = int64((stopPt - startPt)/chandiv);
 [oRead, oWave, oStPt] = CEDS64ReadWaveF(fhand, ch, N+1, startPt);
 if oRead > 0
-rWave = oWave*scale / 6553.6 + offset;
+    rWave = oWave*scale / 6553.6 + offset;
 end
