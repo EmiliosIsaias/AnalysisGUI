@@ -1,5 +1,5 @@
 function iOk = SONXimport(fid)
-
+iOk = -1;
 
 
 v=version;
@@ -12,13 +12,21 @@ else
 end
 
 % Set up MAT-file...
-[pathname, name] = fileparts(fopen(fid));
-FileIdentifier = fopen(fid);
+try
+    FileIdentifier = fopen(fid);
+catch ME
+    disp(ME.getReport)
+    fprintf('The .smrx file might be open by some other program.\n')
+    fprintf('Try closing, for example, spike2 and try again...\n')
+    return
+end
+[pathname, name] = fileparts(FileIdentifier);
 fclose(fid);
 if ~isempty(pathname)
-    pathname=[pathname filesep];
+    matfilename=fullfile(pathname, [name, '.mat']);
+    % pathname=[pathname filesep];
 end
-matfilename=[pathname name '.mat'];
+
 %FileInfo=SONFileHeader(fid);
 FileInfo = SONXFileHeader(FileIdentifier); %#ok<NASGU>
 % ...overwriting any existing file
@@ -63,6 +71,12 @@ if fhand > 0
     end
     chanList(chanList==-1) = [];
 end
+fprintf('Successfully imported file!\n')
+fprintf('The channels in the file are the following:\n')
+for cch = 1:numel(chanList)
+    fprintf('%d ',chanList(cch))
+end
+fprintf('\n')
 iOk = fhand;
 end
 
