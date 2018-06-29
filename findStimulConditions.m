@@ -1,4 +1,3 @@
-% function [fm,condRep,tp1,tp2] = findStimulConditions(stim1,stim2)
 function [fm,condRep,tp1,tp2] = findStimulConditions(stim1,stim2)
 %findStimulConditions Returns the pulse density and their classification
 %for both stimuli taking into account the longest pulse as the condition
@@ -49,11 +48,13 @@ if verifyStimulus(stim1) && verifyStimulus(stim2)
         end
         if sum(fm(1,:)) ~= numel(tr1)
             % We need to think what to do.
-            error('There was a misscalculation in stimulus 1')
+            error(['There was a misscalculation in stimulus 1.',...
+                'We need to take a closer look at these signals'])
         end
         if sum(fm(2,:)) ~= numel(tr2)
             % We need to think what to do.
-            error('There was a misscalculation in stimulus 2')
+            error(['There was a misscalculation in stimulus 2.',...
+                'We need to take a closer look at these signals'])
         end
         [clss, condRep] = KNNinit(fm);
         fm = [fm;clss];
@@ -62,10 +63,12 @@ if verifyStimulus(stim1) && verifyStimulus(stim2)
         return;
     end
 else
-    warning('Further verify the stimulus: size, amplitude, etc.')
+    warning('Further verify the stimulus: length, amplitude, etc.')
     return
 end
 end
+
+%% Auxiliary functions
 
 function iok = verifyStimulus(stim)
 if sum(stim)~=0
@@ -101,21 +104,34 @@ end
 condRep(~condRep) = [];
 end
 
-function [rise,fall] = getRiseFall(stim)
-ds = diff(stim);
-rise = false(size(stim));    % Rising edge times
-fall = rise;                    % Falling edge times
-% Modification: Maximum value divided by three
-% rise(2:end) = ds > 3*std(ds);
-% fall(1:end-1) = ds < -3*std(ds);
-rise(2:end) = ds > max(ds)/3;
-rise = cleanEdges(rise);
-fall(1:end-1) = ds < min(ds)/3;
-fall = cleanEdges(fall);
-if sum(rise) ~= sum(fall)
-    warning('The cardinality of the rising edges is different for the falling edges\n')
+function  [rise, fall] = getRiseFall(stim)
+rise = [];
+fall = [];
+if isnumeric(stim)
+    ds = diff(stim);
+    rise = false(size(stim));    % Rising edge times
+    fall = rise;                    % Falling edge times
+    % Maximum value divided by three
+    rise(2:end) = ds > max(abs(ds))/3;
+    rise = cleanEdges(rise);
+    fall(1:end-1) = ds < min(ds)/3;
+    fall = cleanEdges(fall);
+    if sum(rise) ~= sum(fall)
+        warning('The cardinality of the rising edges is different for the falling edges\n')
+    end
+elseif isa(stim,'logical')
+    aux = stim(1:end-1) - stim(2:end);
+    rise = find(aux == -1)' + 1;
+    fall = find(aux == 1)';
+    if (~isempty(rise) && isempty(fall)) || (numel(rise) ~= numel(fall))
+        fall = [fall;length(stim)];
+    end
+else
+    fprintf('Unrecognised data type for a trigger signal!\n')
+    fprintf('Returning empty variables...\n')
 end
 end
+
 
 function edgeOut = cleanEdges(edgeIn)
 doubleEdge = edgeIn(1:end-1) + edgeIn(2:end);
