@@ -79,7 +79,13 @@ for cc = 1:length(cf)
         % Light control
         auxTrig =  tL(1,tL(3,:)==cc)';
         consTrig = diff(auxTrig);
-        initTrig = cat(find(size(consTrig)~=1),true,consTrig>mean(consTrig));
+        % If the light control is found only once, the initial onset is
+        % taken as the condition trigger.
+        if std(consTrig) < 2
+            initTrig = 1;
+        else
+            initTrig = cat(find(size(consTrig)~=1),true,consTrig>mean(consTrig));
+        end
         trig = auxTrig(initTrig);
         name = 'LaserControl';
     end
