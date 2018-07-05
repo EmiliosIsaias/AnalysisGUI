@@ -2,7 +2,7 @@ function [fm,condRep,tp1,tp2] = findStimulConditions(stim1,stim2)
 %findStimulConditions Returns the pulse density and their classification
 %for both stimuli taking into account the longest pulse as the condition
 %duration. This could be modified in the future.
-%
+% GitHub Comment
 if verifyStimulus(stim1) && verifyStimulus(stim2)
     [r1,f1] = getRiseFall(stim1);
     [r2,f2] = getRiseFall(stim2);
