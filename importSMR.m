@@ -11,7 +11,8 @@ function f=importSMR(fname,fdir,fver)
 
 cd(fdir);
 fid=fopen(fname);
-if fver == 32
+[~,~,flExt] = fileparts(fname);
+if fver == 32 || strcmp(flExt,'.smr')
     f=SONImport(fid);
     if ~f
         display(['Successfully imported ' fname]);
@@ -19,6 +20,10 @@ if fver == 32
         display(['Error importing file ' fname]);
     end
     
-else
+elseif strcmp(flExt,'.smrx')
     f = SONXimport(fid);
+else
+    f = 0;
+    disp('The input file is not in spike2 format!')
+    fprintf('Aborting...\n')
 end
