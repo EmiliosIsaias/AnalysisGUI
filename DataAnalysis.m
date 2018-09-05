@@ -197,20 +197,20 @@ for i=1:handles.N
         load(fname,'EEG','Triggers');
     
         %clear Triggers
-        if exist('EEG')
+        if exist('EEG','var')
             niqf = spikeFindingData.ppms*1000/2;
             [b,a] = butter(2,[.04 500]/niqf);
             eeg=filtfilt(b,a,EEG.data);
             eeg=eeg-max(eeg);eeg=eeg/std(eeg);
         end
         
-        if exist('Triggers') && exist('EEG')
+        if exist('Triggers','var') && exist('EEG','var')
             f=FindEPSPs_gui(RawResponse.data,spikeFindingData.ppms,fname,spikeFindingData.spikes,handles.PATHNAME, eeg,Triggers)
             uiwait(f)
-        elseif exist('Triggers')
+        elseif exist('Triggers','var')
             f=FindEPSPs_gui(RawResponse.data,spikeFindingData.ppms,fname,spikeFindingData.spikes,handles.PATHNAME,0,Triggers)
             uiwait(f)
-        elseif exist('EEG')
+        elseif exist('EEG','var')
             f=FindEPSPs_gui(RawResponse.data,spikeFindingData.ppms,fname,spikeFindingData.spikes,handles.PATHNAME,eeg)
             uiwait(f)
         else
