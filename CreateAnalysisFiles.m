@@ -11,7 +11,12 @@ else
 end
 
 % lastKnownAssignments=open(['D:\Data\AnalysisGui\ChannelStatus.mat'])
-lastKnownAssignments = open(fullfile(pwd,'..\..\ChannelStatus.mat'));
+chStatFile = fullfile(pwd,'..\..\ChannelStatus.mat');
+if exist(chStatFile,'file')
+    lastKnownAssignments = open(fullfile(pwd,'..\..\ChannelStatus.mat'));
+else
+    lastKnownAssignments = [];
+end
 headerNames={};
 channelNames={};
 
