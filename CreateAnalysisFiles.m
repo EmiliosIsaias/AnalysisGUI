@@ -16,7 +16,8 @@ if exist(chStatFile,'file')
     lastKnownAssignments = open(fullfile(pwd,'..\..\ChannelStatus.mat'));
 else
     DATA = {'chan1','head1',''};
-    lastKnownAssignments = DATA;
+    lastKnownAssignments = struct('DATA',DATA);
+    save(chStatFile,'DATA')
 end
 headerNames={};
 channelNames={};
