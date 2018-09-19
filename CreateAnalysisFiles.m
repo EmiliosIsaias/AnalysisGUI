@@ -15,7 +15,8 @@ chStatFile = fullfile(pwd,'..\..\ChannelStatus.mat');
 if exist(chStatFile,'file')
     lastKnownAssignments = open(fullfile(pwd,'..\..\ChannelStatus.mat'));
 else
-    lastKnownAssignments = [];
+    DATA = {'chan1','head1',''};
+    lastKnownAssignments = DATA;
 end
 headerNames={};
 channelNames={};
