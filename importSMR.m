@@ -9,8 +9,8 @@
 function f=importSMR(fname,fdir,fver)
 
 
-cd(fdir);
-fid=fopen(fname);
+% cd(fdir);
+fid=fopen(fullfile(fdir,fname));
 [~,~,flExt] = fileparts(fname);
 if fver == 32 || strcmp(flExt,'.smr')
     f=SONImport(fid);

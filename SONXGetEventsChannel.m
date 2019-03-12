@@ -14,7 +14,8 @@ switch chinfoStruct.kind
         [oRead, outstr] = CEDS64ReadEvents(fhand, ch, N, 0);
     case 4      % Both rise and fall
     case 5      % Marker
-        [oRead, mrkObj] = CEDS64ReadMarkers(fhand, ch, N, 0); %#ok<ASGLU>
+        [oRead, mrkObj] = CEDS64ReadMarkers(fhand, ch, N, 0);
+        outstr = mrkObj;
     case 6      % WaveMark
     case 7      % RealMark
     case 8      % TextMark

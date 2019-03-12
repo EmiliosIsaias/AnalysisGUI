@@ -53,13 +53,18 @@ if fhand > 0
                     SONXGetWaveformChannel(fhand, ch,...
                     header);
                 saveMATfile(Npts,matfilename,chanAux, header,fv)
-            elseif chtype > 1 && chtype <= 9
+            elseif chtype > 1 && chtype <= 9 && chtype ~= 5
                 % Event-based channel
                 [Npts, chanAux] =...
                     SONXGetEventsChannel(fhand, ch,...
                     header);
                 saveMATfile(Npts,matfilename,chanAux, header,fv)
-                
+            elseif chtype == 5
+                % Keyboard channel
+                [Npts, chanAux] =...
+                    SONXGetEventsChannel(fhand, ch,...
+                    header);
+                saveMATfile(Npts,matfilename,chanAux, header,fv)
             else
                 % Not a channel or not used and it is suspicious how
                 % did it get into here.
