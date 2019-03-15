@@ -1,6 +1,19 @@
-function iOk = SONXimport(fid)
+function iOk = SONXimport(fid,varargin)
 iOk = -1;
 
+%% Parsing inputs
+p = inputParser;
+
+defaultFileType = 'mat';
+validFileTypes = {'mat','bin'};
+checkFileType = @(x) any(validatestring(x,validFileTypes));
+
+addRequired(p,'fid',@isnumeric);
+addOptional(p,'FileType',defaultFileType,checkFileType);
+
+parse(p,fid,varargin{:});
+fileType = p.Results.FileType;
+%%
 
 v=version;
 v=str2double(v(1:3));
@@ -22,15 +35,34 @@ catch ME
 end
 [pathname, name] = fileparts(FileIdentifier);
 fclose(fid);
+
 if ~isempty(pathname)
-    matfilename=fullfile(pathname, [name, '.mat']);
+    switch fileType
+        case 'mat'
+            outfilename=fullfile(pathname, [name, '.mat']);
+        case 'bin'
+            outfilename = fullfile(pathname, [name, '.bin']);
+    end
+    if exist(outfilename,'file')
+        ovwtAns = questdlg(...
+            sprintf('Warning! File %s exists. Overwrite?',outfilename),...
+            'Overwrite?','Yes','No','No');
+        if strcmpi(ovwtAns,'no')
+            fprintf('No file written.\n')
+            return
+        end
+    end
     % pathname=[pathname filesep];
 end
 
 %FileInfo=SONFileHeader(fid);
 FileInfo = SONXFileHeader(FileIdentifier); %#ok<NASGU>
-% ...overwriting any existing file
-save(matfilename,'FileInfo',fv)
+switch fileType
+    case 'mat'
+        save(outfilename,'FileInfo',fv)
+    case 'bin'
+        % Saving the header
+end
 
 % Deal with the channels in the file
 % c=SONChanList(fid);
@@ -52,19 +84,36 @@ if fhand > 0
                 [Npts, chanAux, ~] =...
                     SONXGetWaveformChannel(fhand, ch,...
                     header);
-                saveMATfile(Npts,matfilename,chanAux, header,fv)
+                switch fileType
+                    case 'mat'
+                        saveMATfile(Npts,outfilename,chanAux, header,fv)
+                    case 'bin'
+                        saveBINfile(Npts, outfilename,chanAux)
+                end
             elseif chtype > 1 && chtype <= 9 && chtype ~= 5
                 % Event-based channel
                 [Npts, chanAux] =...
                     SONXGetEventsChannel(fhand, ch,...
                     header);
-                saveMATfile(Npts,matfilename,chanAux, header,fv)
+                switch fileType
+                    case 'mat'
+                        saveMATfile(Npts,outfilename,chanAux, header,fv)
+                    case 'bin'
+                        fprintf('Omitting channel %d. Not a waveform\n',ch)
+                        chanList(ch) = -1;
+                end
             elseif chtype == 5
                 % Keyboard channel
                 [Npts, chanAux] =...
                     SONXGetEventsChannel(fhand, ch,...
                     header);
-                saveMATfile(Npts,matfilename,chanAux, header,fv)
+                switch fileType
+                    case 'mat'
+                        saveMATfile(Npts,outfilename,chanAux, header,fv)
+                    case 'bin'
+                        fprintf('Omitting channel %d. Not a waveform\n',ch)
+                        chanList(ch) = -1;
+                end
             else
                 % Not a channel or not used and it is suspicious how
                 % did it get into here.
@@ -97,4 +146,17 @@ if Npts > 0
 else
     warning('There is something wrong with channel %d',header.phyChan)
 end
+end
+
+function saveBINfile(Npts, binfilename,chanAux)
+% 32 bit depth integer representation of the -5 to 5 V range from the
+% amplifier row signal.
+m = (2^32)/100;
+chanAuxInt = int16(reshape(chanAux,1,Npts) * m);
+fID = fopen(binfilename,'a');
+iOk = fwrite(fID,chanAuxInt,'int16');
+fclose(fID);
+if iOk ~= Npts
+    fprintf('Channel point number: %d, written numbers: %d\n',Npts,iOk)
+end 
 end
