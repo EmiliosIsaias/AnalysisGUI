@@ -3,7 +3,7 @@ function Head = SONXFileHeader(fname)
 fhand = CEDS64Open(fname);
 Head = struct();
 switch fhand
-    case 0
+    case num2cell(0:64)
         Head.FileIdentifier = fname;
         Head.systemID = CEDS64Version(fhand);           % 6
         Head.copyright = '(C) CED 14';% Where is the copyright?! fscanf(fid,'%c',10);
