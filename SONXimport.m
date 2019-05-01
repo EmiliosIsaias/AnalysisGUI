@@ -57,16 +57,19 @@ end
 
 %FileInfo=SONFileHeader(fid);
 FileInfo = SONXFileHeader(FileIdentifier); %#ok<NASGU>
-switch fileType
-    case 'mat'
-        save(outfilename,'FileInfo',fv)
-    case 'bin'
-        % Saving the header
-end
+
 
 % Deal with the channels in the file
 % c=SONChanList(fid);
 fhand = CEDS64Open(FileIdentifier);
+if fhand > 0
+    switch fileType
+        case 'mat'
+            save(outfilename,'FileInfo',fv)
+        case 'bin'
+            % Saving the header
+    end
+end
 if fhand > 0
     recChans = 0;
     % Import the data.
@@ -124,14 +127,17 @@ if fhand > 0
         end
     end
     chanList(chanList==-1) = [];
+    fprintf('Successfully imported file!\n')
+    fprintf('The channels in the file are the following:\n')
+    for cch = 1:numel(chanList)
+        fprintf('%d ',chanList(cch))
+    end
+    fprintf('\n')
+    iOk = fhand;
+else
+    fprintf(1,'Something about this file is not right. Please check it\n')
 end
-fprintf('Successfully imported file!\n')
-fprintf('The channels in the file are the following:\n')
-for cch = 1:numel(chanList)
-    fprintf('%d ',chanList(cch))
-end
-fprintf('\n')
-iOk = fhand;
+
 end
 
 function saveMATfile(Npts, matfilename,chanAux, header,fv)
