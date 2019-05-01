@@ -42,7 +42,7 @@ switch fhand
         CEDS64Close(fhand);
     case -1 %NO_FILE
         fprintf(1,'Attempt to use when file not open, or use of an ')
-        fprintf(1,'invalid file handle, or no spare file handle.\n'
+        fprintf(1,'invalid file handle, or no spare file handle.\n')
         fprintf(1,'Some functions that return a time will return -1 to ')
         fprintf(1,'mean nothing found, so this is not necessarily an error.\n')
         fprintf(1,'Check the function description.')
