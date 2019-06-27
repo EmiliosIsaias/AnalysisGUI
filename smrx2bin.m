@@ -1,5 +1,6 @@
 function iOk = smrx2bin(fid)
 iOk = -1;
+impStr = 'Rhd';
 
 try
     FileIdentifier = fopen(fid);
@@ -67,7 +68,8 @@ if fhand > 0
     chanList = chanList(chTypes == 1);
     chead = numel(heads);
     while chead >= 1
-        if isnan(str2double(heads(chead).title))
+        if ~xor(isnan(str2double(heads(chead).title)),...
+                ~contains(heads(chead).title,impStr))
             heads(chead) = [];
             chanList(chead) = [];
         end
@@ -75,6 +77,7 @@ if fhand > 0
     end
     multiplexerFactor = heads(1).ChanDiv;
     fs = 1 / (FileInfo.usPerTime * multiplexerFactor);
+    fprintf('Sampling Frequency: %f\n',fs)
     dataPointsExp = ceil(log10(fs)+2);
     wwidth = 10^ceil(log10(fs)+2)/fs;
     is = 1/fs;
@@ -92,9 +95,9 @@ if fhand > 0
             dataBuff = zeros(numel(chanList),int32(diff(timeSegment)*fs),...
                 'int16');
         end
-        for ch = chanList
+        for ch = 1:numel(chanList)
             [Npts, chanAux, ~] =...
-                SONXGetWaveformChannelSegment(fhand, ch, timeSegment,...
+                SONXGetWaveformChannelSegment(fhand, chanList(ch), timeSegment,...
                 heads(ch)); %#ok<ASGLU>
             dat = int16(chanAux * m);
             try
