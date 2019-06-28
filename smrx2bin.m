@@ -77,6 +77,7 @@ if fhand > 0
     end
     multiplexerFactor = heads(1).ChanDiv;
     fs = 1 / (FileInfo.usPerTime * multiplexerFactor);
+    save(fullfile(pathname,'sampling_frequency.mat'),'fs')
     fprintf('Sampling Frequency: %f\n',fs)
     dataPointsExp = ceil(log10(fs)+2);
     wwidth = 10^ceil(log10(fs)+2)/fs;
