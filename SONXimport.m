@@ -56,8 +56,7 @@ if ~isempty(pathname)
 end
 
 %FileInfo=SONFileHeader(fid);
-FileInfo = SONXFileHeader(FileIdentifier); %#ok<NASGU>
-
+FileInfo = SONXFileHeader(FileIdentifier);
 
 % Deal with the channels in the file
 % c=SONChanList(fid);
@@ -121,10 +120,20 @@ if fhand > 0
                 % Not a channel or not used and it is suspicious how
                 % did it get into here.
             end
-            clearvars('header')
+            
         else
             chanList(ch) = -1;
         end
+    end
+    multiplexerFactor = header.ChanDiv;
+    fs = 1 / (FileInfo.usPerTime * multiplexerFactor);
+    FileInfo.SamplingFrequency = fs;
+    switch fileType
+        case 'mat'
+            save(outfilename,'FileInfo','-append',fv)
+        case 'bin'
+            fprintf(1,'The file information will not be saved ')
+            fprintf(1,'in the binary file.\n')
     end
     chanList(chanList==-1) = [];
     fprintf('Successfully imported file!\n')
@@ -150,7 +159,7 @@ if Npts > 0
     S.(varname) = header; %#ok<STRNU>
     save(matfilename, '-struct', 'S','-append',fv)
 else
-    warning('There is something wrong with channel %d',header.phyChan)
+    warning('There is something wrong with channel: %d',header.phyChan)
 end
 end
 
