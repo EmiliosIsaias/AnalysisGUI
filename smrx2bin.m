@@ -23,7 +23,7 @@ else
     fclose(fid);
 end
 
-display(FileInfo)
+
 
 if ~isempty(pathname)
     outfilename = fullfile(pathname, [name, '.bin']);
@@ -77,7 +77,9 @@ if fhand > 0
     end
     multiplexerFactor = heads(1).ChanDiv;
     fs = 1 / (FileInfo.usPerTime * multiplexerFactor);
-    fprintf('Sampling Frequency: %f\n',fs)
+    FileInfo.SamplingFrequency = fs;
+    save(fullfile(pathname, [name, '_sampling_frequency.mat']),'fs')
+    display(FileInfo)
     dataPointsExp = ceil(log10(fs)+2);
     wwidth = 10^ceil(log10(fs)+2)/fs;
     is = 1/fs;
