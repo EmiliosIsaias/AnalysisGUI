@@ -43,9 +43,8 @@ switch fhand
     case -1 %NO_FILE
         fprintf(1,'Attempt to use when file not open, or use of an ')
         fprintf(1,'invalid file handle, or no spare file handle.\n')
-        fprintf(1,'Some functions that return a time will return -1 to ')
-        fprintf(1,'mean nothing found, so this is not necessarily an error.\n')
-        fprintf(1,'Check the function description.')
+        fprintf(1,'This is not necessarily an error.\n')
+        fprintf(1,'Check the function description.\n')
     case -2 %NO_BLOCK
         disp('Failed to allocate a disk block when writing to the file.')
         disp('The disk is probably full, or there was a disk error.')
