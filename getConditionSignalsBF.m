@@ -62,7 +62,7 @@ if fhand > 0
     for ch=1:mxChans
         chtype = CEDS64ChanType(fhand,ch);
         % fprintf('Channel %d type: %d\n',ch,chtype)
-        if chtype > 0
+        if chtype > 0 && chtype ~= 3
             % Recognized as a channel
             recChans = recChans + 1;
             header = SONXChannelInfo(fhand,ch,recChans);
