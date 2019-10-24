@@ -110,15 +110,32 @@ for cf = 1:Nf
         save(fullfile(dataDir,...
             [smrxFiles(cf).name, '_sampling_frequency.mat']),'fs')
         display(FileInfo)
-        dataPointsExp = ceil(log10(fs)+2);
-        wwidth = 10^ceil(log10(fs)+2)/fs;
+        % Determining the necessary array size to occupy approximately the
+        % 75% of the available memory given that the array is int16
+        memStruct = memory;
+        BuffSize = 3 * memStruct.MemAvailableAllArrays / 8;
+        dataPointsExp = (BuffSize / numel(chanList));
+        if heads(1).npoints - dataPointsExp < 0
+            dataPointsExp = heads(1).npoints;
+        end
+        wwidth = double(dataPointsExp)/fs;
+        % dataPointsExp = ceil(log10(fs)+2);
+        % wwidth = 10^ceil(log10(fs)+2)/fs;
         is = 1/fs;
         cw = 0;
+        if abs(totalTime-(heads(1).stop - heads(1).start))
+            oldTotalTime = totalTime;
+            totalTime = heads(1).stop - heads(1).start;
+            fprintf(1,'The length of the signals in the file seem to ')
+            fprintf(1,'differ (%.3f s \\delta (%.3f ms)).\nConsidering %.3f seconds\n',...
+                oldTotalTime, 1e3*(oldTotalTime - totalTime), totalTime)
+        end
         while cw < totalTime
             %         if exist('Npts','var')
             %             fID = fopen(outfilename,'a');
             %         end
-            dataBuff = zeros(numel(chanList),10^dataPointsExp,'int16');
+            % dataBuff = zeros(numel(chanList),10^dataPointsExp,'int16');
+            dataBuff = zeros(numel(chanList),dataPointsExp,'int16');
             if cw <= totalTime - wwidth
                 timeSegment = [cw, cw + wwidth];
             else
@@ -127,6 +144,7 @@ for cf = 1:Nf
                 dataBuff = zeros(numel(chanList),int32(diff(timeSegment)*fs),...
                     'int16');
             end
+            fprintf(1,'Reading... ')
             for ch = 1:numel(chanList)
                 [Npts, chanAux, ~] =...
                     SONXGetWaveformChannelSegment(fhand, chanList(ch), timeSegment,...
@@ -138,8 +156,11 @@ for cf = 1:Nf
                     dataBuff(ch,1:length(dat)) = dat;
                 end
             end
+            fprintf(1,'done!\n')
             cw = cw + wwidth + is;
+            fprintf(1,'Writting... ')
             fwrite(fID,dataBuff,'int16');
+            fprintf(1,' done!\n')
             %         ftell(fID)
             %         fclose(fID);
         end
