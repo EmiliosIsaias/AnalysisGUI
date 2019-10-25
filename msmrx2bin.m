@@ -67,6 +67,12 @@ for cf = 1:Nf
     cfName = fullfile(smrxFiles(cf).folder,smrxFiles(cf).name);
     FileInfo = SONXFileHeader(cfName);
     fhand = CEDS64Open(cfName);
+    if fhand < 0
+        fprintf(1,'The file might be opened in Spike2. Please close it and')        
+        fprintf(1,' try again.\n')
+        fclose(fID);
+        return
+    end
     totalTime = CEDS64TicksToSecs(fhand,FileInfo.maxFTime);
     
     if fhand > 0
@@ -115,7 +121,7 @@ for cf = 1:Nf
         memStruct = memory;
         BuffSize = 3 * memStruct.MemAvailableAllArrays / 8;
         dataPointsExp = (BuffSize / numel(chanList));
-        if heads(1).npoints - dataPointsExp < 0
+        if heads(1).npoints < dataPointsExp
             dataPointsExp = heads(1).npoints;
         end
         wwidth = double(dataPointsExp)/fs;
