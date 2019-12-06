@@ -113,8 +113,9 @@ for cf = 1:Nf
         multiplexerFactor = heads(1).ChanDiv;
         fs = 1 / (FileInfo.usPerTime * multiplexerFactor);
         FileInfo.SamplingFrequency = fs;
+        [~, baseName, ~] = fileparts(smrxFiles(cf).name);
         save(fullfile(dataDir,...
-            [smrxFiles(cf).name, '_sampling_frequency.mat']),'fs')
+            [baseName, '_sampling_frequency.mat']),'fs')
         display(FileInfo)
         % Determining the necessary array size to occupy approximately the
         % 75% of the available memory given that the array is int16
