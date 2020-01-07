@@ -150,6 +150,7 @@ for cf = 1:Nf
                 dataBuff = zeros(numel(chanList),int32(diff(timeSegment)*fs),...
                     'int16');
             end
+            shortFlag = false;
             fprintf(1,'Reading... ')
             for ch = 1:numel(chanList)
                 [Npts, chanAux, ~] =...
@@ -160,11 +161,16 @@ for cf = 1:Nf
                     dataBuff(ch,:) = dat;
                 catch
                     dataBuff(ch,1:length(dat)) = dat;
+                    shortFlag = true;
                 end
             end
+            
             fprintf(1,'done!\n')
             cw = cw + wwidth + is;
             fprintf(1,'Writting... ')
+            if shortFlag
+                dataBuff(:,length(dat)+1:dataPointsExp) = [];
+            end
             fwrite(fID,dataBuff,'int16');
             fprintf(1,' done!\n')
             %         ftell(fID)
