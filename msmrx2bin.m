@@ -121,7 +121,7 @@ for cf = 1:Nf
         % 75% of the available memory given that the array is int16
         memStruct = memory;
         BuffSize = 3 * memStruct.MemAvailableAllArrays / 8;
-        dataPointsExp = (BuffSize / numel(chanList));
+        dataPointsExp = (BuffSize / (numel(chanList) * 2));
         if heads(1).npoints < dataPointsExp
             dataPointsExp = heads(1).npoints;
         end
