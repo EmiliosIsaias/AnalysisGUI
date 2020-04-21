@@ -63,6 +63,7 @@ if exist(outFullName,'file')
 end
 fID = fopen(outFullName,'w');
 m = (2^32)/100;
+fs = zeros(Nf,1);
 for cf = 1:Nf
     cfName = fullfile(smrxFiles(cf).folder,smrxFiles(cf).name);
     FileInfo = SONXFileHeader(cfName);
@@ -113,12 +114,11 @@ for cf = 1:Nf
         multiplexerFactor = heads(1).ChanDiv;
         fs(cf) = 1 / (FileInfo.usPerTime * multiplexerFactor);
         FileInfo.SamplingFrequency = fs(cf);
-        [~, baseName, ~] = fileparts(smrxFiles(cf).name);
         display(FileInfo)
         % Determining the necessary array size to occupy approximately the
         % 75% of the available memory given that the array is int16
         memStruct = memory;
-        BuffSize = 3 * memStruct.MemAvailableAllArrays / 8;
+        BuffSize = 3 * memStruct.MemAvailableAllArrays / 4;
         dataPointsExp = (BuffSize / (numel(chanList) * 2));
         if heads(1).npoints < dataPointsExp
             dataPointsExp = heads(1).npoints;
@@ -185,8 +185,11 @@ save(fullfile(dataDir,...
             [outBaseName, '_sampling_frequency.mat']),'fs')
 fprintf('Successfully imported files!\n')
 fprintf('The files merged are the following:\n')
+smrxFileNames = cell(numel(smrxFiles),1);
 for cf = 1:numel(smrxFiles)
     fprintf('%s\n',smrxFiles(cf).name)
+    smrxFileNames(cf) = {smrxFiles(cf).name};
 end
+save(fullfile(dataDir,[outBaseName,'_fileOrder.mat']),'smrxFileNames','outBaseName');
 iOk = CEDS64Close(fhand);
 end
