@@ -111,11 +111,9 @@ for cf = 1:Nf
             chead = chead - 1;
         end
         multiplexerFactor = heads(1).ChanDiv;
-        fs = 1 / (FileInfo.usPerTime * multiplexerFactor);
-        FileInfo.SamplingFrequency = fs;
+        fs(cf) = 1 / (FileInfo.usPerTime * multiplexerFactor);
+        FileInfo.SamplingFrequency = fs(cf);
         [~, baseName, ~] = fileparts(smrxFiles(cf).name);
-        save(fullfile(dataDir,...
-            [baseName, '_sampling_frequency.mat']),'fs')
         display(FileInfo)
         % Determining the necessary array size to occupy approximately the
         % 75% of the available memory given that the array is int16
@@ -181,6 +179,10 @@ for cf = 1:Nf
     CEDS64Close(fhand);
 end
 fclose(fID);
+fs = mean(fs); %#ok<NASGU>
+[~, outBaseName] = fileparts(outFullName);
+save(fullfile(dataDir,...
+            [outBaseName, '_sampling_frequency.mat']),'fs')
 fprintf('Successfully imported files!\n')
 fprintf('The files merged are the following:\n')
 for cf = 1:numel(smrxFiles)
