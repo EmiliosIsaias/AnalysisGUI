@@ -186,10 +186,13 @@ save(fullfile(dataDir,...
 fprintf('Successfully imported files!\n')
 fprintf('The files merged are the following:\n')
 smrxFileNames = cell(numel(smrxFiles),1);
+ffoID = fopen(fullfile(dataDir,[outBaseName,'_fileOrder.txt']),'w');
 for cf = 1:numel(smrxFiles)
-    fprintf('%s\n',smrxFiles(cf).name)
+    fprintf(1,'%s\n',smrxFiles(cf).name);
     smrxFileNames(cf) = {smrxFiles(cf).name};
+    fprintf(ffoID, '%s\n', smrxFiles(cf).name);
 end
-save(fullfile(dataDir,[outBaseName,'_fileOrder.mat']),'smrxFileNames','outBaseName');
+fprintf(ffoID, '%s.bin', outBaseName);
+fclose(ffoID);
 iOk = CEDS64Close(fhand);
 end
