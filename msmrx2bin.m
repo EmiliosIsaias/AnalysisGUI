@@ -1,6 +1,10 @@
-function iOk = msmrx2bin(dataDir, outBaseName)
+function iOk = msmrx2bin(dataDir, outBaseName, chanGroup)
 iOk = -1;
 impStr = 'Rhd';
+
+if ~exist('chanGroup','var') || isempty(chanGroup)
+    chanGroup = "";
+end
 
 smrxFiles = dir(fullfile(dataDir,'*.smrx'));
 if isempty(smrxFiles)
@@ -100,8 +104,10 @@ for cf = 1:Nf
                 heads(ch) = SONXChannelInfo(fhand,ch,fch);
             end
         end
-        heads = heads(chTypes == 1);
-        chanList = chanList(chTypes == 1);
+        chanNames = string({heads.title}');
+        desChans = contains(chanNames, chanGroup);
+        heads = heads(chTypes == 1 & desChans);
+        chanList = chanList(chTypes == 1 & desChans);
         chead = numel(heads);
         while chead >= 1
             if ~xor(isnan(str2double(heads(chead).title)),...
