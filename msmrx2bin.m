@@ -132,7 +132,7 @@ for cf = 1:Nf
         wwidth = double(dataPointsExp)/fs;
         % dataPointsExp = ceil(log10(fs)+2);
         % wwidth = 10^ceil(log10(fs)+2)/fs;
-        is = 1/fs;
+        is = 1./fs;
         cw = 0;
         if abs(totalTime-(heads(1).stop - heads(1).start))
             oldTotalTime = totalTime;
@@ -152,7 +152,7 @@ for cf = 1:Nf
             else
                 timeSegment = [cw, totalTime];
                 cw = totalTime * 2;
-                dataBuff = zeros(numel(chanList),int32(diff(timeSegment)*fs),...
+                dataBuff = zeros(numel(chanList),int32(diff(timeSegment)*fs(cf)),...
                     'int16');
             end
             shortFlag = false;
