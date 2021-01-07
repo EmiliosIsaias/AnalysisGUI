@@ -15,7 +15,7 @@ if numel(sp)==0
 end
 % what if there is just one spike?
 if numel(sp)==1
-    Bursts={sp}
+    Bursts={sp};
     firstSpikes=sp;
     C=1;
 else
